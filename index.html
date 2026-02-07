@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>THE VAULT — Luxury Asset Intelligence | ₹ INR</title>
+  <meta name="description" content="170+ investment-grade luxury assets. Compare sneakers, bags, watches vs NIFTY 50, S&P 500, Gold, Bitcoin returns. All prices in ₹ INR." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="THE VAULT — Luxury Asset Intelligence" />
+  <meta property="og:description" content="170+ luxury assets as investments. Compare vs NIFTY 50, S&P 500, Gold, Bitcoin." />
+  <meta property="og:type" content="website" />
+
+  <!-- React 18 + Babel CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a0a; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-thumb { background: #222; border-radius: 4px; }
+    ::selection { background: rgba(200,248,112,0.18); }
+    input::placeholder { color: #333; }
+    select option { background: #111; color: #ddd; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    @keyframes slideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    input[type="range"] { -webkit-appearance:none;width:100%;height:4px;border-radius:2px;outline:none;cursor:pointer;background:linear-gradient(to right,#c8f870 var(--val,50%),rgba(255,255,255,0.06) var(--val,50%)); }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#c8f870;border:3px solid #0a0a0a;box-shadow:0 0 8px rgba(200,248,112,0.3);cursor:pointer; }
+    input[type="range"]::-moz-range-thumb { width:20px;height:20px;border-radius:50%;background:#c8f870;border:3px solid #0a0a0a;box-shadow:0 0 8px rgba(200,248,112,0.3);cursor:pointer; }
+    #loading { position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:9999;animation:fadeIn .3s ease; }
+    #loading .spinner { font-size:48px;animation:pulse 1.5s infinite; }
+    #loading .text { font-family:Georgia,serif;font-size:28px;color:#fff;font-weight:900;letter-spacing:2px; }
+    #loading .sub { font-family:monospace;font-size:10px;color:#c8f870;letter-spacing:4px; }
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <div class="spinner">💎</div>
+    <div class="text">THE VAULT</div>
+    <div class="sub">LOADING 170+ ASSETS...</div>
+  </div>
+  <div id="root"></div>
+
+  <script type="text/babel" data-type="module">
+    const { useState, useMemo, useEffect, useRef } = React;
+
+    // ═══════════════════════════════════════════════════════════════
+    // THE VAULT — LUXURY ASSET INTELLIGENCE (INR)
+    // 170+ items · ₹ Investment Calculator · NIFTY/S&P/Gold/BTC
+    // Deploy: vercel deploy | Set ANTHROPIC_API_KEY env var for AI
+    // ═══════════════════════════════════════════════════════════════
+
+    const USD_INR = 85;
+
+    const RAW = [
+      // ── JORDAN 1 HIGH ──
+      {id:"j1h1",n:"AJ1 High OG Chicago",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Chicago (2015)",y:2015,r:160,p:2800},
+      {id:"j1h2",n:"AJ1 High OG Bred",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Bred (2016)",y:2016,r:160,p:580},
+      {id:"j1h3",n:"AJ1 High OG Royal",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Royal Blue (2017)",y:2017,r:160,p:450},
+      {id:"j1h4",n:"AJ1 High OG Bred Toe",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Bred Toe",y:2018,r:160,p:520},
+      {id:"j1h5",n:"AJ1 High OG Pine Green",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Pine Green",y:2018,r:160,p:380},
+      {id:"j1h6",n:"AJ1 High OG Obsidian UNC",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Obsidian UNC",y:2019,r:160,p:420},
+      {id:"j1h7",n:"AJ1 High OG Mocha",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Dark Mocha",y:2020,r:170,p:520},
+      {id:"j1h8",n:"AJ1 High OG University Blue",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"University Blue",y:2021,r:170,p:380},
+      {id:"j1h9",n:"AJ1 High OG Lost & Found",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Chicago Reimagined",y:2022,r:180,p:340},
+      {id:"j1h10",n:"AJ1 High OG Fragment",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Fragment (2014)",y:2014,r:185,p:5500},
+      {id:"j1h11",n:"AJ1 High OG Off-White Chicago",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Off-White Chicago",y:2017,r:190,p:6500},
+      {id:"j1h12",n:"AJ1 High OG Off-White UNC",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Off-White UNC",y:2018,r:190,p:4200},
+      {id:"j1h13",n:"AJ1 High OG Off-White NRG",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Off-White Europe",y:2018,r:190,p:3500},
+      {id:"j1h14",n:"AJ1 High OG Travis Scott",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Travis Scott Mocha",y:2019,r:175,p:2200},
+      {id:"j1h15",n:"AJ1 High OG Union Black Toe",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Union LA Black Toe",y:2018,r:190,p:2200},
+      {id:"j1h16",n:"AJ1 High OG Union Storm Blue",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Union Storm Blue",y:2018,r:190,p:1800},
+      {id:"j1h17",n:"AJ1 High OG Dior",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Dior",y:2020,r:2200,p:12000},
+      {id:"j1h18",n:"AJ1 High OG Hyper Royal",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Hyper Royal",y:2021,r:170,p:310},
+      {id:"j1h19",n:"AJ1 High OG Shadow 2.0",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Shadow 2.0",y:2021,r:170,p:280},
+      {id:"j1h20",n:"AJ1 High OG Court Purple",b:"Jordan",c:"Sneakers",s:"Jordan 1",cl:"Court Purple",y:2018,r:160,p:340},
+      // ── JORDAN 1 LOW ──
+      {id:"j1l1",n:"AJ1 Low TS Reverse Mocha",b:"Jordan",c:"Sneakers",s:"Jordan 1 Low",cl:"Reverse Mocha",y:2022,r:150,p:1450},
+      {id:"j1l2",n:"AJ1 Low Fragment x TS",b:"Jordan",c:"Sneakers",s:"Jordan 1 Low",cl:"Fragment x TS",y:2021,r:150,p:1800},
+      {id:"j1l3",n:"AJ1 Low TS Olive",b:"Jordan",c:"Sneakers",s:"Jordan 1 Low",cl:"Medium Olive",y:2024,r:150,p:420},
+      {id:"j1l4",n:"AJ1 Low TS Canary",b:"Jordan",c:"Sneakers",s:"Jordan 1 Low",cl:"Canary",y:2024,r:150,p:350},
+      // ── JORDAN 3 ──
+      {id:"j3r1",n:"AJ3 White Cement Reimagined",b:"Jordan",c:"Sneakers",s:"Jordan 3",cl:"White Cement",y:2023,r:200,p:310},
+      {id:"j3r2",n:"AJ3 A Ma Maniére",b:"Jordan",c:"Sneakers",s:"Jordan 3",cl:"A Ma Maniére",y:2021,r:200,p:480},
+      {id:"j3r3",n:"AJ3 Black Cement",b:"Jordan",c:"Sneakers",s:"Jordan 3",cl:"Black Cement (2018)",y:2018,r:200,p:350},
+      // ── JORDAN 4 ──
+      {id:"j4r1",n:"AJ4 Retro Bred",b:"Jordan",c:"Sneakers",s:"Jordan 4",cl:"Bred (2019)",y:2019,r:200,p:680},
+      {id:"j4r2",n:"AJ4 White Cement",b:"Jordan",c:"Sneakers",s:"Jordan 4",cl:"White Cement (2016)",y:2016,r:220,p:550},
+      {id:"j4r3",n:"AJ4 University Blue",b:"Jordan",c:"Sneakers",s:"Jordan 4",cl:"University Blue",y:2021,r:200,p:420},
+      {id:"j4r4",n:"AJ4 Military Black",b:"Jordan",c:"Sneakers",s:"Jordan 4",cl:"Military Black",y:2022,r:210,p:340},
+      {id:"j4r5",n:"AJ4 Off-White Sail",b:"Jordan",c:"Sneakers",s:"Jordan 4",cl:"Off-White Sail",y:2020,r:200,p:1250},
+      {id:"j4r6",n:"AJ4 Travis Scott Purple",b:"Jordan",c:"Sneakers",s:"Jordan 4",cl:"TS Purple",y:2018,r:225,p:1200},
+      {id:"j4r7",n:"AJ4 KAWS Grey",b:"Jordan",c:"Sneakers",s:"Jordan 4",cl:"KAWS Grey",y:2017,r:350,p:2800},
+      {id:"j4r8",n:"AJ4 Bred Reimagined",b:"Jordan",c:"Sneakers",s:"Jordan 4",cl:"Bred Reimagined",y:2024,r:215,p:280},
+      // ── JORDAN 5/6/11 ──
+      {id:"j5r1",n:"AJ5 Off-White Sail",b:"Jordan",c:"Sneakers",s:"Jordan 5",cl:"Off-White Sail",y:2020,r:225,p:520},
+      {id:"j5r2",n:"AJ5 DJ Khaled Crimson",b:"Jordan",c:"Sneakers",s:"Jordan 5",cl:"Crimson Bliss",y:2022,r:225,p:1100},
+      {id:"j6r1",n:"AJ6 TS British Khaki",b:"Jordan",c:"Sneakers",s:"Jordan 6",cl:"British Khaki",y:2021,r:250,p:480},
+      {id:"j6r2",n:"AJ6 TS Olive",b:"Jordan",c:"Sneakers",s:"Jordan 6",cl:"Olive",y:2019,r:250,p:620},
+      {id:"j6r3",n:"AJ6 Infrared",b:"Jordan",c:"Sneakers",s:"Jordan 6",cl:"Infrared (2019)",y:2019,r:200,p:280},
+      {id:"j11r1",n:"AJ11 Retro Bred",b:"Jordan",c:"Sneakers",s:"Jordan 11",cl:"Bred (2019)",y:2019,r:220,p:420},
+      {id:"j11r2",n:"AJ11 Concord",b:"Jordan",c:"Sneakers",s:"Jordan 11",cl:"Concord (2018)",y:2018,r:220,p:380},
+      {id:"j11r3",n:"AJ11 Cool Grey",b:"Jordan",c:"Sneakers",s:"Jordan 11",cl:"Cool Grey",y:2021,r:225,p:350},
+      {id:"j11r4",n:"AJ11 Space Jam",b:"Jordan",c:"Sneakers",s:"Jordan 11",cl:"Space Jam",y:2016,r:220,p:350},
+      // ── NIKE SB DUNK ──
+      {id:"sb1",n:"SB Dunk Low Paris",b:"Nike SB",c:"Sneakers",s:"Dunk SB",cl:"Paris",y:2003,r:65,p:28000},
+      {id:"sb2",n:"SB Dunk Low Pigeon",b:"Nike SB",c:"Sneakers",s:"Dunk SB",cl:"Pigeon",y:2005,r:65,p:15000},
+      {id:"sb3",n:"SB Dunk Low Tiffany",b:"Nike SB",c:"Sneakers",s:"Dunk SB",cl:"Tiffany",y:2005,r:65,p:8500},
+      {id:"sb4",n:"SB Dunk Low Heineken",b:"Nike SB",c:"Sneakers",s:"Dunk SB",cl:"Heineken",y:2003,r:65,p:6000},
+      {id:"sb5",n:"SB Dunk Low Freddy Krueger",b:"Nike SB",c:"Sneakers",s:"Dunk SB",cl:"Freddy Krueger",y:2007,r:90,p:12000},
+      {id:"sb6",n:"SB Dunk Low Stussy Cherry",b:"Nike SB",c:"Sneakers",s:"Dunk SB",cl:"Stussy Cherry",y:2005,r:88,p:4200},
+      {id:"sb7",n:"SB Dunk Low Supreme",b:"Nike SB",c:"Sneakers",s:"Dunk SB",cl:"Supreme Red Cement",y:2002,r:88,p:5500},
+      {id:"sb8",n:"SB Dunk Low Travis Scott",b:"Nike SB",c:"Sneakers",s:"Dunk SB",cl:"Travis Scott",y:2020,r:150,p:1800},
+      {id:"sb9",n:"SB Dunk Low Strangelove",b:"Nike SB",c:"Sneakers",s:"Dunk SB",cl:"Strangelove",y:2020,r:110,p:1600},
+      {id:"sb10",n:"SB Dunk Low Chunky Dunky",b:"Nike SB",c:"Sneakers",s:"Dunk SB",cl:"Ben & Jerry's",y:2020,r:110,p:2200},
+      {id:"sb11",n:"SB Dunk Low Grateful Dead",b:"Nike SB",c:"Sneakers",s:"Dunk SB",cl:"Grateful Dead",y:2020,r:110,p:2800},
+      {id:"sb12",n:"SB Dunk Low Purple Lobster",b:"Nike SB",c:"Sneakers",s:"Dunk SB",cl:"Purple Lobster",y:2018,r:110,p:2400},
+      {id:"sb13",n:"SB Dunk Low Red Lobster",b:"Nike SB",c:"Sneakers",s:"Dunk SB",cl:"Red Lobster",y:2008,r:110,p:5500},
+      // ── NIKE / DUNK ──
+      {id:"dk1",n:"Dunk Low Kentucky",b:"Nike",c:"Sneakers",s:"Dunk",cl:"Kentucky",y:2020,r:100,p:380},
+      {id:"dk2",n:"Dunk Low Syracuse",b:"Nike",c:"Sneakers",s:"Dunk",cl:"Syracuse",y:2020,r:100,p:320},
+      {id:"dk3",n:"Dunk Low Veneer",b:"Nike",c:"Sneakers",s:"Dunk",cl:"Veneer",y:2020,r:100,p:420},
+      {id:"nk1",n:"AF1 Louis Vuitton",b:"Nike",c:"Sneakers",s:"Air Force 1",cl:"LV White",y:2022,r:2750,p:8500},
+      {id:"nk2",n:"AF1 Off-White Volt",b:"Nike",c:"Sneakers",s:"Air Force 1",cl:"OW Volt",y:2018,r:160,p:680},
+      {id:"nk4",n:"Air Max 97 Wotherspoon",b:"Nike",c:"Sneakers",s:"Air Max",cl:"Sean Wotherspoon",y:2018,r:160,p:1400},
+      {id:"nk5",n:"Air Max 90 OW Desert Ore",b:"Nike",c:"Sneakers",s:"Air Max",cl:"OW Desert Ore",y:2019,r:160,p:680},
+      {id:"nk6",n:"Air Presto Off-White",b:"Nike",c:"Sneakers",s:"Presto",cl:"OW White",y:2017,r:160,p:850},
+      {id:"nk7",n:"Air Mag Self-Lacing",b:"Nike",c:"Sneakers",s:"Air Mag",cl:"BTTF (2016)",y:2016,r:28000,p:52000},
+      {id:"nk8",n:"Kobe 6 Protro Grinch",b:"Nike",c:"Sneakers",s:"Kobe",cl:"Grinch",y:2020,r:180,p:750},
+      {id:"nk10",n:"LDWaffle Sacai Blue",b:"Nike",c:"Sneakers",s:"Sacai",cl:"Blue Multi",y:2019,r:175,p:480},
+      {id:"nk11",n:"Air Max 1 Patta Waves",b:"Nike",c:"Sneakers",s:"Air Max",cl:"Patta Monarch",y:2021,r:160,p:380},
+      // ── YEEZY ──
+      {id:"yz1",n:"Yeezy 350 V1 Turtle Dove",b:"Yeezy",c:"Sneakers",s:"Yeezy 350",cl:"Turtle Dove",y:2015,r:200,p:2200},
+      {id:"yz2",n:"Yeezy 350 V1 Pirate Black",b:"Yeezy",c:"Sneakers",s:"Yeezy 350",cl:"Pirate Black",y:2015,r:200,p:1800},
+      {id:"yz3",n:"Yeezy 350 V2 Beluga",b:"Yeezy",c:"Sneakers",s:"Yeezy 350",cl:"Beluga",y:2016,r:220,p:520},
+      {id:"yz4",n:"Yeezy 350 V2 Zebra",b:"Yeezy",c:"Sneakers",s:"Yeezy 350",cl:"Zebra",y:2017,r:220,p:380},
+      {id:"yz5",n:"Yeezy 350 V2 Bred",b:"Yeezy",c:"Sneakers",s:"Yeezy 350",cl:"Black Red",y:2017,r:220,p:620},
+      {id:"yz6",n:"Yeezy 350 V2 Static RF",b:"Yeezy",c:"Sneakers",s:"Yeezy 350",cl:"Static Reflective",y:2018,r:250,p:580},
+      {id:"yz7",n:"Yeezy 700 Wave Runner",b:"Yeezy",c:"Sneakers",s:"Yeezy 700",cl:"Wave Runner OG",y:2017,r:300,p:420},
+      {id:"yz8",n:"Yeezy 750 OG",b:"Yeezy",c:"Sneakers",s:"Yeezy 750",cl:"Light Brown",y:2015,r:350,p:1800},
+      {id:"yz9",n:"Yeezy Foam Runner Onyx",b:"Yeezy",c:"Sneakers",s:"Yeezy Foam",cl:"Onyx",y:2022,r:90,p:160},
+      // ── NEW BALANCE / ASICS ──
+      {id:"nb1",n:"NB 550 ALD Green",b:"New Balance",c:"Sneakers",s:"NB 550",cl:"ALD Green",y:2020,r:110,p:450},
+      {id:"nb2",n:"NB 550 ALD Navy",b:"New Balance",c:"Sneakers",s:"NB 550",cl:"ALD Navy",y:2020,r:110,p:380},
+      {id:"nb3",n:"NB 2002R Rain Cloud",b:"New Balance",c:"Sneakers",s:"NB 2002R",cl:"Rain Cloud",y:2022,r:140,p:280},
+      {id:"nb4",n:"NB 990v3 JJJJound",b:"New Balance",c:"Sneakers",s:"NB 990",cl:"JJJJound Olive",y:2023,r:260,p:420},
+      {id:"nb5",n:"NB 9060 Joe Freshgoods",b:"New Balance",c:"Sneakers",s:"NB 9060",cl:"Inside Voices",y:2022,r:150,p:380},
+      {id:"as1",n:"ASICS GL3 KITH",b:"ASICS",c:"Sneakers",s:"Gel-Lyte",cl:"KITH Militia",y:2021,r:120,p:380},
+      // ═══ BAGS ═══
+      {id:"hb1",n:"Birkin 25 Noir Togo",b:"Hermès",c:"Bags",s:"Birkin",cl:"Noir GHW",y:2015,r:9550,p:22000},
+      {id:"hb2",n:"Birkin 25 Gold Togo",b:"Hermès",c:"Bags",s:"Birkin",cl:"Gold GHW",y:2016,r:9800,p:20000},
+      {id:"hb3",n:"Birkin 25 Etoupe",b:"Hermès",c:"Bags",s:"Birkin",cl:"Etoupe GHW",y:2018,r:10200,p:18000},
+      {id:"hb4",n:"Birkin 25 Himalaya",b:"Hermès",c:"Bags",s:"Birkin",cl:"Himalaya Croc",y:2017,r:42000,p:150000},
+      {id:"hb5",n:"Birkin 25 Rose Sakura",b:"Hermès",c:"Bags",s:"Birkin",cl:"Rose Sakura",y:2019,r:10900,p:28000},
+      {id:"hb6",n:"Birkin 30 Noir Togo",b:"Hermès",c:"Bags",s:"Birkin",cl:"Noir 30",y:2016,r:10900,p:18500},
+      {id:"hb7",n:"Birkin 35 Croc Black",b:"Hermès",c:"Bags",s:"Birkin",cl:"Porosus Croc",y:2018,r:37000,p:64000},
+      {id:"hb8",n:"Birkin Sellier 25",b:"Hermès",c:"Bags",s:"Birkin",cl:"Sellier Noir Epsom",y:2021,r:11000,p:25000},
+      {id:"hb9",n:"Kelly 25 Noir Epsom",b:"Hermès",c:"Bags",s:"Kelly",cl:"Noir GHW",y:2019,r:8850,p:24000},
+      {id:"hb10",n:"Kelly 25 Etoupe",b:"Hermès",c:"Bags",s:"Kelly",cl:"Etoupe GHW",y:2020,r:9350,p:20000},
+      {id:"hb11",n:"Kelly 25 Gold",b:"Hermès",c:"Bags",s:"Kelly",cl:"Gold Epsom",y:2020,r:9350,p:19000},
+      {id:"hb12",n:"Kelly Mini II",b:"Hermès",c:"Bags",s:"Kelly",cl:"Mini II Noir",y:2022,r:8500,p:24000},
+      {id:"hb13",n:"Constance 24 Noir",b:"Hermès",c:"Bags",s:"Constance",cl:"Noir GHW",y:2020,r:8750,p:18000},
+      {id:"hb14",n:"Constance 18 Rose",b:"Hermès",c:"Bags",s:"Constance",cl:"Rose Azalee",y:2021,r:7250,p:14000},
+      {id:"hb15",n:"Picotin Lock 18",b:"Hermès",c:"Bags",s:"Picotin",cl:"Etoupe",y:2021,r:3075,p:5200},
+      {id:"hb16",n:"Lindy 26 Etoupe",b:"Hermès",c:"Bags",s:"Lindy",cl:"Etoupe",y:2021,r:7400,p:10000},
+      {id:"ch1",n:"Classic Flap Medium",b:"Chanel",c:"Bags",s:"Classic Flap",cl:"Black Caviar GHW",y:2019,r:5800,p:10200},
+      {id:"ch2",n:"Classic Flap Jumbo",b:"Chanel",c:"Bags",s:"Classic Flap",cl:"Jumbo Black",y:2018,r:5600,p:11500},
+      {id:"ch3",n:"Classic Flap Mini",b:"Chanel",c:"Bags",s:"Classic Flap",cl:"Mini Black",y:2021,r:4200,p:7500},
+      {id:"ch4",n:"Classic Flap Beige",b:"Chanel",c:"Bags",s:"Classic Flap",cl:"Beige Caviar",y:2020,r:6800,p:10800},
+      {id:"ch5",n:"2.55 Reissue 226",b:"Chanel",c:"Bags",s:"2.55",cl:"Aged Calfskin",y:2019,r:5900,p:8200},
+      {id:"ch6",n:"Boy Medium Black",b:"Chanel",c:"Bags",s:"Boy",cl:"Black Caviar",y:2020,r:5800,p:7800},
+      {id:"ch7",n:"WOC Black Caviar",b:"Chanel",c:"Bags",s:"WOC",cl:"Black GHW",y:2020,r:3100,p:4200},
+      {id:"lv1",n:"Neverfull MM",b:"Louis Vuitton",c:"Bags",s:"Neverfull",cl:"Monogram",y:2020,r:1500,p:2200},
+      {id:"lv2",n:"Speedy 30 Murakami",b:"Louis Vuitton",c:"Bags",s:"Speedy",cl:"Multicolor",y:2003,r:1100,p:3500},
+      {id:"lv3",n:"Keepall 50 Prism",b:"Louis Vuitton",c:"Bags",s:"Keepall",cl:"Virgil Prism",y:2019,r:2960,p:6500},
+      {id:"lv4",n:"Pochette Métis",b:"Louis Vuitton",c:"Bags",s:"Pochette",cl:"Monogram",y:2020,r:1980,p:2800},
+      {id:"di1",n:"Lady Dior Medium",b:"Dior",c:"Bags",s:"Lady Dior",cl:"Black Cannage",y:2020,r:5500,p:7200},
+      {id:"di2",n:"Saddle Oblique",b:"Dior",c:"Bags",s:"Saddle",cl:"Oblique Blue",y:2019,r:3350,p:3800},
+      {id:"go1",n:"St. Louis PM",b:"Goyard",c:"Bags",s:"St. Louis",cl:"Black/Black",y:2021,r:1580,p:2400},
+      {id:"go2",n:"St. Louis GM",b:"Goyard",c:"Bags",s:"St. Louis",cl:"Black/Tan",y:2021,r:1825,p:2800},
+      {id:"pr1",n:"Re-Edition 2005",b:"Prada",c:"Bags",s:"Re-Edition",cl:"Black Nylon",y:2020,r:1090,p:1600},
+      {id:"fe1",n:"Baguette 1997",b:"Fendi",c:"Bags",s:"Baguette",cl:"Beaded Carrie",y:1997,r:1690,p:3600},
+      {id:"tf1",n:"Shopping Bag Med",b:"Telfar",c:"Bags",s:"Telfar",cl:"Black",y:2020,r:202,p:320},
+      // ═══ WATCHES ═══
+      {id:"rx1",n:"Submariner 126610LN",b:"Rolex",c:"Watches",s:"Submariner",cl:"Black",y:2020,r:9150,p:16500},
+      {id:"rx2",n:"Submariner Hulk",b:"Rolex",c:"Watches",s:"Submariner",cl:"Green 116610LV",y:2019,r:9150,p:22000},
+      {id:"rx3",n:"Submariner Kermit",b:"Rolex",c:"Watches",s:"Submariner",cl:"126610LV",y:2020,r:9550,p:18000},
+      {id:"rx4",n:"Daytona Panda",b:"Rolex",c:"Watches",s:"Daytona",cl:"White 116500LN",y:2019,r:13150,p:32000},
+      {id:"rx5",n:"Daytona Black",b:"Rolex",c:"Watches",s:"Daytona",cl:"Black 116500LN",y:2019,r:13150,p:28000},
+      {id:"rx6",n:"Daytona Paul Newman",b:"Rolex",c:"Watches",s:"Daytona",cl:"Paul Newman 6239",y:1970,r:300,p:250000},
+      {id:"rx7",n:"GMT Pepsi",b:"Rolex",c:"Watches",s:"GMT",cl:"Pepsi 126710",y:2018,r:9700,p:22000},
+      {id:"rx8",n:"GMT Batgirl",b:"Rolex",c:"Watches",s:"GMT",cl:"Batman 126710",y:2019,r:9700,p:18000},
+      {id:"rx9",n:"Datejust 41 Blue",b:"Rolex",c:"Watches",s:"Datejust",cl:"Blue Fluted",y:2020,r:10650,p:14500},
+      {id:"rx10",n:"Day-Date Green Gold",b:"Rolex",c:"Watches",s:"Day-Date",cl:"Green 128238",y:2020,r:36450,p:48000},
+      {id:"rx11",n:"Sky-Dweller Blue",b:"Rolex",c:"Watches",s:"Sky-Dweller",cl:"Blue Jubilee",y:2020,r:15250,p:25000},
+      {id:"pp1",n:"Nautilus 5711/1A Blue",b:"Patek Philippe",c:"Watches",s:"Nautilus",cl:"Blue Dial",y:2019,r:35000,p:130000},
+      {id:"pp2",n:"Nautilus 5711 Green",b:"Patek Philippe",c:"Watches",s:"Nautilus",cl:"Olive Green",y:2021,r:35000,p:160000},
+      {id:"pp3",n:"Nautilus 5712 Moon",b:"Patek Philippe",c:"Watches",s:"Nautilus",cl:"Moon Phase",y:2019,r:44000,p:95000},
+      {id:"pp4",n:"Aquanaut 5167A",b:"Patek Philippe",c:"Watches",s:"Aquanaut",cl:"Black",y:2019,r:21000,p:52000},
+      {id:"pp5",n:"Aquanaut Tiffany",b:"Patek Philippe",c:"Watches",s:"Aquanaut",cl:"Khaki Green",y:2021,r:23200,p:85000},
+      {id:"ap1",n:"Royal Oak 15500ST",b:"Audemars Piguet",c:"Watches",s:"Royal Oak",cl:"Blue 41mm",y:2019,r:22600,p:48000},
+      {id:"ap2",n:"Royal Oak Jumbo",b:"Audemars Piguet",c:"Watches",s:"Royal Oak",cl:"15202ST",y:2018,r:27500,p:85000},
+      {id:"om1",n:"Speedmaster Snoopy",b:"Omega",c:"Watches",s:"Speedmaster",cl:"Silver Snoopy 50th",y:2020,r:9600,p:28000},
+      {id:"om2",n:"Speedmaster Moonwatch",b:"Omega",c:"Watches",s:"Speedmaster",cl:"Hesalite",y:2021,r:6300,p:7800},
+      {id:"om3",n:"MoonSwatch Moon",b:"Omega x Swatch",c:"Watches",s:"MoonSwatch",cl:"Mission to Moon",y:2022,r:260,p:380},
+      {id:"rm1",n:"RM 011 Felipe Massa",b:"Richard Mille",c:"Watches",s:"RM",cl:"Titanium",y:2018,r:145000,p:185000},
+      {id:"rm2",n:"RM 035 Nadal",b:"Richard Mille",c:"Watches",s:"RM",cl:"NTPT",y:2019,r:165000,p:210000},
+      {id:"tu1",n:"Black Bay 58 Blue",b:"Tudor",c:"Watches",s:"Black Bay",cl:"79030B",y:2020,r:3575,p:4200},
+      {id:"ca1",n:"Santos Medium",b:"Cartier",c:"Watches",s:"Santos",cl:"Silver",y:2020,r:7050,p:8200},
+      // ═══ APPAREL ═══
+      {id:"sp1",n:"Box Logo Tee White",b:"Supreme",c:"Apparel",s:"T-Shirts",cl:"White/Red",y:2020,r:38,p:350},
+      {id:"sp2",n:"Box Logo Tee Black",b:"Supreme",c:"Apparel",s:"T-Shirts",cl:"Black",y:2019,r:38,p:420},
+      {id:"sp3",n:"Box Logo Tee 20th",b:"Supreme",c:"Apparel",s:"T-Shirts",cl:"Grey/Red 20th",y:2014,r:32,p:800},
+      {id:"sp4",n:"Supreme x LV Bogo",b:"Supreme",c:"Apparel",s:"T-Shirts",cl:"White Monogram",y:2017,r:480,p:2800},
+      {id:"sp5",n:"Box Logo Hoodie Grey",b:"Supreme",c:"Apparel",s:"Hoodies",cl:"Heather Grey FW18",y:2018,r:168,p:1100},
+      {id:"sp6",n:"Box Logo Hoodie Bandana",b:"Supreme",c:"Apparel",s:"Hoodies",cl:"Bandana Red",y:2019,r:168,p:850},
+      {id:"sp7",n:"Box Logo Hoodie Navy",b:"Supreme",c:"Apparel",s:"Hoodies",cl:"Navy FW19",y:2019,r:168,p:780},
+      {id:"sp8",n:"Supreme x LV Bumbag",b:"Supreme",c:"Apparel",s:"Accessories",cl:"Red Monogram",y:2017,r:1960,p:12000},
+      {id:"ts1",n:"Astroworld Hoodie",b:"Travis Scott",c:"Apparel",s:"Hoodies",cl:"Wish You Were Here",y:2018,r:95,p:350},
+      {id:"ow1",n:"Off-White Diag Tee",b:"Off-White",c:"Apparel",s:"T-Shirts",cl:"Black/White",y:2019,r:310,p:580},
+      {id:"ow2",n:"OW Caravaggio Tee",b:"Off-White",c:"Apparel",s:"T-Shirts",cl:"Black",y:2017,r:290,p:650},
+      {id:"bp1",n:"Shark Hoodie Blue",b:"Bape",c:"Apparel",s:"Hoodies",cl:"Blue Camo",y:2019,r:420,p:680},
+      {id:"ch_j1",n:"Cross Patch Jeans",b:"Chrome Hearts",c:"Apparel",s:"Jeans",cl:"Black",y:2021,r:1850,p:4200},
+      {id:"ch_j2",n:"Horseshoe Jeans",b:"Chrome Hearts",c:"Apparel",s:"Jeans",cl:"Blue",y:2020,r:1650,p:3500},
+      {id:"ch_a1",n:"Trucker Hat CH+",b:"Chrome Hearts",c:"Apparel",s:"Accessories",cl:"Black",y:2020,r:350,p:850},
+      {id:"gd1",n:"La Flare Jeans",b:"Gallery Dept.",c:"Apparel",s:"Jeans",cl:"Blue Reworked",y:2022,r:690,p:1100},
+      {id:"am1",n:"MX1 Jeans",b:"Amiri",c:"Apparel",s:"Jeans",cl:"Classic Indigo",y:2020,r:1090,p:1450},
+      {id:"kp1",n:"Boro Patchwork",b:"Kapital",c:"Apparel",s:"Jeans",cl:"Boro Indigo",y:2020,r:720,p:1400},
+      {id:"tnf1",n:"TNF x Supreme Nuptse",b:"Supreme",c:"Apparel",s:"Jackets",cl:"Leaves Print",y:2016,r:368,p:1800},
+      {id:"tnf2",n:"TNF x Supreme BAMN",b:"Supreme",c:"Apparel",s:"Jackets",cl:"By Any Means",y:2015,r:348,p:1400},
+    ];
+
+    // ═══ DERIVED DATA ═══
+    const DB = RAW.map(i => ({
+      ...i, name: i.n, brand: i.b, category: i.c, subcategory: i.s, colorway: i.cl,
+      releaseYear: i.y, retailPrice: Math.round(i.r * USD_INR), currentPrice: Math.round(i.p * USD_INR),
+      mult: i.p / i.r,
+    }));
+
+    const CATS = ["All", "Sneakers", "Bags", "Watches", "Apparel"];
+    const fINR = v => { if (v >= 10000000) return `₹${(v/10000000).toFixed(2)} Cr`; if (v >= 100000) return `₹${(v/100000).toFixed(2)} L`; return `₹${v.toLocaleString("en-IN")}`; };
+    const fFull = v => `₹${v.toLocaleString("en-IN")}`;
+    const roi = (r, c) => (((c - r) / r) * 100).toFixed(1);
+    const cagr = (r, c, y) => y > 0 ? (((c / r) ** (1 / y) - 1) * 100).toFixed(1) : "0";
+
+    const BENCH = [
+      { n: "NIFTY 50", cagr: 12.5, i: "🇮🇳", c: "#ff6b35" },
+      { n: "S&P 500", cagr: 10.5, i: "🇺🇸", c: "#4a90d9" },
+      { n: "Gold", cagr: 11, i: "🥇", c: "#f0c040" },
+      { n: "Bitcoin", cagr: 75, i: "₿", c: "#f7931a" },
+      { n: "Fixed Deposit", cagr: 7, i: "🏦", c: "#777" },
+      { n: "PPF", cagr: 7.1, i: "🏛️", c: "#666" },
+    ];
+
+    const GRAD = { Sneakers: "linear-gradient(135deg,#1a1a2e,#16213e)", Bags: "linear-gradient(135deg,#2d1b2e,#462639)", Watches: "linear-gradient(135deg,#1a2332,#1e3a5f)", Apparel: "linear-gradient(135deg,#1e1e2a,#2a2a3d)" };
+    const ICON = { Sneakers: "👟", Bags: "👜", Watches: "⌚", Apparel: "👕" };
+
+    // ═══ AI LOOKUP — uses /api/lookup serverless function ═══
+    async function aiLookup(q) {
+      try {
+        const res = await fetch("/api/lookup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: q }),
+        });
+        const data = await res.json();
+        if (data.error) return null;
+        return {
+          ...data,
+          retailINR: data.retailINR || Math.round((data.retailPriceUSD || 0) * USD_INR),
+          currentINR: data.currentINR || Math.round((data.currentPriceUSD || 0) * USD_INR),
+        };
+      } catch { return null; }
+    }
+
+    // ═══ COMPARISON CHART ═══
+    function CompChart({ amt, yr, mult, name }) {
+      const yrs = 2026 - yr; if (yrs <= 0 || amt <= 0) return null;
+      const val = Math.round(amt * mult);
+      const all = [{ n: name, v: val, c: "#c8f870", i: "💎", a: true }, ...BENCH.map(b => ({ n: b.n, v: Math.round(amt * Math.pow(1 + b.cagr / 100, yrs)), c: b.c, i: b.i, a: false }))];
+      const sorted = [...all].sort((a, b) => b.v - a.v);
+      const mx = Math.max(...sorted.map(c => c.v));
+      const rank = sorted.findIndex(c => c.a) + 1;
+      return (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
+            <span style={{ fontSize: "10px", color: "#555", letterSpacing: "2px" }}>{fFull(amt)} IN {yr} · {yrs}YRS</span>
+            <span style={{ background: rank <= 2 ? "rgba(200,248,112,0.08)" : "rgba(255,150,50,0.08)", border: `1px solid ${rank <= 2 ? "rgba(200,248,112,0.2)" : "rgba(255,150,50,0.2)"}`, borderRadius: "20px", padding: "3px 12px", fontSize: "11px", color: rank <= 2 ? "#c8f870" : "#ffa040" }}>#{rank}/{all.length}</span>
+          </div>
+          {sorted.map((c, i) => { const w = Math.max((c.v / mx) * 100, 3); const r = (((c.v - amt) / amt) * 100).toFixed(0); return (
+            <div key={i} style={{ marginBottom: "14px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ fontSize: "14px" }}>{c.i}</span>
+                  <span style={{ fontSize: "12px", color: c.a ? "#c8f870" : "#777", fontWeight: c.a ? "700" : "400" }}>{c.n}</span>
+                  {c.a && <span style={{ background: "#c8f870", color: "#0a0a0a", fontSize: "8px", fontWeight: "800", padding: "2px 6px", borderRadius: "3px" }}>YOU</span>}
+                </div>
+                <div style={{ display: "flex", gap: "12px", alignItems: "baseline" }}>
+                  <span style={{ fontSize: "11px", fontFamily: "monospace", color: r >= 0 ? "#c8f870" : "#ff6b6b" }}>{r >= 0 ? "+" : ""}{Number(r).toLocaleString()}%</span>
+                  <span style={{ fontSize: "13px", fontFamily: "monospace", color: c.a ? "#fff" : "#aaa", fontWeight: c.a ? "700" : "400", minWidth: "85px", textAlign: "right" }}>{fINR(c.v)}</span>
+                </div>
+              </div>
+              <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: "4px", height: "6px", overflow: "hidden" }}>
+                <div style={{ width: `${w}%`, height: "100%", background: `linear-gradient(90deg,${c.c}80,${c.c})`, borderRadius: "4px", transition: "width 0.6s ease", boxShadow: c.a ? `0 0 10px ${c.c}40` : "none" }} />
+              </div>
+            </div>
+          ); })}
+        </div>
+      );
+    }
+
+    // ═══ DONUT CHART (Groww-style) ═══
+    function DonutChart({ invested, returns }) {
+      const total = invested + returns;
+      if (total <= 0) return null;
+      const invPct = invested / total;
+      const retPct = returns / total;
+      const r = 80, cx = 100, cy = 100, sw = 28;
+      const circ = 2 * Math.PI * r;
+      const invLen = circ * invPct;
+      const retLen = circ * retPct;
+      const gap = 4;
+      return (
+        <svg viewBox="0 0 200 200" width="200" height="200">
+          <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth={sw} />
+          <circle cx={cx} cy={cy} r={r} fill="none" stroke="#5b6cf7" strokeWidth={sw}
+            strokeDasharray={`${Math.max(invLen - gap, 0)} ${circ}`}
+            strokeDashoffset={circ * 0.25} strokeLinecap="round"
+            style={{ transition: "stroke-dasharray 0.6s ease" }} />
+          <circle cx={cx} cy={cy} r={r} fill="none" stroke="#c8f870" strokeWidth={sw}
+            strokeDasharray={`${Math.max(retLen - gap, 0)} ${circ}`}
+            strokeDashoffset={circ * 0.25 - invLen} strokeLinecap="round"
+            style={{ transition: "all 0.6s ease" }} />
+          <text x={cx} y={cy - 8} textAnchor="middle" fill="#888" fontSize="9" fontFamily="system-ui">TOTAL VALUE</text>
+          <text x={cx} y={cy + 14} textAnchor="middle" fill="#fff" fontSize="16" fontWeight="700" fontFamily="monospace">{fINR(total)}</text>
+        </svg>
+      );
+    }
+
+    // ═══ TOP ROI CARD (compact) ═══
+    function TopROICard({ item, rank, onClick }) {
+      const r = roi(item.retailPrice, item.currentPrice);
+      const sipVal = Math.round(100000 * item.mult);
+      return (
+        <div onClick={() => onClick(item)} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)", borderRadius: "12px", padding: "14px", cursor: "pointer", transition: "all 0.2s", position: "relative" }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(200,248,112,0.25)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.04)"; e.currentTarget.style.transform = ""; }}>
+          <div style={{ position: "absolute", top: "-8px", left: "12px", background: rank <= 3 ? "#c8f870" : "rgba(200,248,112,0.15)", color: rank <= 3 ? "#0a0a0a" : "#c8f870", fontSize: "9px", fontWeight: "800", padding: "2px 8px", borderRadius: "10px", fontFamily: "monospace" }}>#{rank}</div>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "10px", marginTop: "4px" }}>
+            <span style={{ fontSize: "22px" }}>{ICON[item.category]}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: "12px", fontWeight: "600", color: "#ddd", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.name}</div>
+              <div style={{ fontSize: "9px", color: "#444" }}>{item.brand} · {item.releaseYear}</div>
+            </div>
+            <div style={{ background: "rgba(200,248,112,0.1)", padding: "3px 8px", borderRadius: "8px", fontSize: "13px", fontFamily: "monospace", fontWeight: "700", color: "#c8f870", whiteSpace: "nowrap" }}>+{r}%</div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <div><div style={{ fontSize: "8px", color: "#333", letterSpacing: "1px" }}>₹1L →</div><div style={{ fontSize: "14px", fontFamily: "monospace", fontWeight: "700", color: "#c8f870" }}>{fINR(sipVal)}</div></div>
+            <div style={{ textAlign: "right" }}><div style={{ fontSize: "8px", color: "#333", letterSpacing: "1px" }}>RESALE</div><div style={{ fontSize: "12px", fontFamily: "monospace", color: "#fff" }}>{fINR(item.currentPrice)}</div></div>
+          </div>
+        </div>
+      );
+    }
+
+    // ═══ PRODUCT CARD ═══
+    function PCard({ item, onClick }) {
+      const r = roi(item.retailPrice, item.currentPrice); const pos = r >= 0;
+      const sipVal = Math.round(100000 * item.mult);
+      return (
+        <div onClick={() => onClick(item)} style={{ background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)", borderRadius: "12px", overflow: "hidden", cursor: "pointer", transition: "all 0.2s" }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(200,248,112,0.2)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.04)"; e.currentTarget.style.transform = ""; }}>
+          <div style={{ background: GRAD[item.category], height: "90px", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+            <span style={{ fontSize: "36px", filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.3))" }}>{ICON[item.category]}</span>
+            <div style={{ position: "absolute", top: "8px", right: "8px", background: pos ? "rgba(200,248,112,0.15)" : "rgba(255,100,100,0.15)", padding: "2px 8px", borderRadius: "12px", fontSize: "10px", fontWeight: "600", fontFamily: "monospace", color: pos ? "#c8f870" : "#ff6b6b" }}>{pos ? "+" : ""}{r}%</div>
+            <div style={{ position: "absolute", bottom: "6px", left: "8px", fontSize: "9px", color: "rgba(255,255,255,0.35)", letterSpacing: "1px" }}>{item.brand}</div>
+          </div>
+          <div style={{ padding: "12px 14px" }}>
+            <div style={{ fontSize: "12px", fontWeight: "600", color: "#ccc", marginBottom: "2px", lineHeight: "1.3" }}>{item.name}</div>
+            <div style={{ fontSize: "10px", color: "#444", marginBottom: "10px" }}>{item.colorway} · {item.releaseYear}</div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+              <div><div style={{ fontSize: "8px", color: "#333", letterSpacing: "1px" }}>RETAIL</div><div style={{ fontSize: "11px", color: "#555", textDecoration: "line-through", fontFamily: "monospace" }}>{fINR(item.retailPrice)}</div></div>
+              <div style={{ textAlign: "right" }}><div style={{ fontSize: "8px", color: "#333", letterSpacing: "1px" }}>RESALE</div><div style={{ fontSize: "14px", color: "#fff", fontWeight: "600", fontFamily: "monospace" }}>{fINR(item.currentPrice)}</div></div>
+            </div>
+            <div style={{ background: "rgba(200,248,112,0.04)", border: "1px solid rgba(200,248,112,0.08)", borderRadius: "6px", padding: "6px 8px", textAlign: "center" }}>
+              <div style={{ fontSize: "8px", color: "#666", letterSpacing: "1px" }}>₹1L INVESTED → NOW</div>
+              <div style={{ fontSize: "15px", fontFamily: "monospace", fontWeight: "700", color: "#c8f870" }}>{fINR(sipVal)}</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ═══ MAIN APP ═══
+    function App() {
+      const [tab, setTab] = useState("calc");
+      const [sel, setSel] = useState(null);
+      const [mode, setMode] = useState("database");
+      const [search, setSearch] = useState("");
+      const [catF, setCatF] = useState("All");
+      const [brandF, setBrandF] = useState("All");
+      const [sortBy, setSortBy] = useState("roi_desc");
+      const [show, setShow] = useState(false);
+      const [investAmt, setInvestAmt] = useState(100000);
+      const [buyYear, setBuyYear] = useState(null); // null = auto (release year)
+      const [cN, setCN] = useState(""); const [cR, setCR] = useState(""); const [cC, setCC] = useState(""); const [cY, setCY] = useState("2020");
+      const [aiQ, setAiQ] = useState(""); const [aiL, setAiL] = useState(false); const [aiRes, setAiRes] = useState(null); const [aiErr, setAiErr] = useState("");
+      const [page, setPage] = useState(1);
+      const dropRef = useRef(null);
+
+      useEffect(() => { const h = e => { if (dropRef.current && !dropRef.current.contains(e.target)) setShow(false); }; document.addEventListener("mousedown", h); return () => document.removeEventListener("mousedown", h); }, []);
+      useEffect(() => { document.getElementById("loading").style.display = "none"; }, []);
+
+      const doAI = async () => { if (!aiQ.trim()) return; setAiL(true); setAiErr(""); setAiRes(null); const r = await aiLookup(aiQ); setAiL(false); if (r) { setAiRes(r); setCN(r.name || aiQ); setCR(String(r.retailINR || "")); setCC(String(r.currentINR || "")); setCY(String(r.releaseYear || "2020")); setMode("custom"); } else setAiErr("Couldn't find pricing. Try more specific, or check that ANTHROPIC_API_KEY is set in Vercel env vars."); };
+
+      const filtered = useMemo(() => {
+        let items = DB;
+        if (catF !== "All") items = items.filter(i => i.category === catF);
+        if (brandF !== "All") items = items.filter(i => i.brand === brandF);
+        if (search) { const q = search.toLowerCase(); items = items.filter(i => (i.name + i.brand + i.colorway + i.subcategory).toLowerCase().includes(q)); }
+        if (sortBy === "roi_desc") return [...items].sort((a, b) => b.mult - a.mult);
+        if (sortBy === "price_desc") return [...items].sort((a, b) => b.currentPrice - a.currentPrice);
+        if (sortBy === "year_desc") return [...items].sort((a, b) => b.releaseYear - a.releaseYear);
+        return items;
+      }, [search, catF, brandF, sortBy]);
+
+      const searchFilt = useMemo(() => {
+        let items = DB; if (catF !== "All") items = items.filter(i => i.category === catF);
+        if (search) { const q = search.toLowerCase(); items = items.filter(i => (i.name + i.brand + i.colorway + i.subcategory).toLowerCase().includes(q)); }
+        return items;
+      }, [search, catF]);
+
+      const brands = useMemo(() => [...new Set((catF === "All" ? DB : DB.filter(i => i.category === catF)).map(i => i.brand))].sort(), [catF]);
+      const topROI = useMemo(() => [...DB].sort((a, b) => b.mult - a.mult).slice(0, 8), []);
+      useEffect(() => { setPage(1); }, [search, catF, brandF, sortBy]);
+      useEffect(() => { setBrandF("All"); }, [catF]);
+
+      const PER = 48; const tP = Math.ceil(filtered.length / PER); const pg = filtered.slice((page - 1) * PER, page * PER);
+
+      const retailP = mode === "database" && sel ? sel.retailPrice : Number(cR) || 0;
+      const curP = mode === "database" && sel ? sel.currentPrice : Number(cC) || 0;
+      const releaseYr = mode === "database" && sel ? sel.releaseYear : Number(cY) || 2020;
+      const totalYrs = 2026 - releaseYr;
+      const assetCAGR = retailP > 0 && totalYrs > 0 ? ((curP / retailP) ** (1 / totalYrs) - 1) : 0;
+      // buyYear: user can pick any year from releaseYr to 2025
+      const effectiveBuyYear = buyYear !== null ? Math.max(releaseYr, Math.min(2025, buyYear)) : releaseYr;
+      // Estimate the price at the buy year using CAGR interpolation
+      const yearsSinceRelease = effectiveBuyYear - releaseYr;
+      const buyPrice = yearsSinceRelease > 0 ? Math.round(retailP * Math.pow(1 + assetCAGR, yearsSinceRelease)) : retailP;
+      const holdingYrs = 2026 - effectiveBuyYear;
+      const assetMult = buyPrice > 0 ? curP / buyPrice : 0;
+      const sipVal = Math.round(investAmt * assetMult);
+      const sipGain = sipVal - investAmt;
+      const roiV = buyPrice > 0 ? roi(buyPrice, curP) : 0;
+      const cagrV = buyPrice > 0 && holdingYrs > 0 ? cagr(buyPrice, curP, holdingYrs) : 0;
+      const dispName = mode === "database" && sel ? sel.name : cN || "This Asset";
+      const has = retailP > 0 && curP > 0;
+      const avgROI = (DB.reduce((s, i) => s + Number(roi(i.retailPrice, i.currentPrice)), 0) / DB.length).toFixed(0);
+      const IS = { width: "100%", padding: "12px 14px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "8px", color: "#fff", fontSize: "13px", outline: "none", fontFamily: "system-ui,sans-serif" };
+      const LS = { fontSize: "9px", color: "#555", letterSpacing: "2px", display: "block", marginBottom: "6px" };
+      const selP = item => { setSel(item); setMode("database"); setTab("calc"); setSearch(item.name + " " + item.colorway); setShow(false); setBuyYear(null); };
+
+      return (
+        <div style={{ minHeight: "100vh", background: "#0a0a0a", color: "#d0d0d0", fontFamily: "system-ui,-apple-system,sans-serif" }}>
+
+          {/* ── TICKER BAR ── */}
+          <div style={{ background: "#c8f870", overflow: "hidden", height: "28px", display: "flex", alignItems: "center", fontFamily: "monospace", fontSize: "10px", fontWeight: "600", color: "#0a0a0a" }}>
+            <div style={{ display: "flex", animation: "ticker 100s linear infinite", whiteSpace: "nowrap" }}>
+              {[...DB.slice(0, 40), ...DB.slice(0, 40)].map((item, i) => (<span key={i} style={{ marginRight: "24px" }}>{item.brand} {item.colorway} — {fINR(item.currentPrice)} ↑{roi(item.retailPrice, item.currentPrice)}%</span>))}
+            </div>
+          </div>
+
+          <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 24px" }}>
+            {/* ── HEADER ── */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px", marginBottom: "8px" }}>
+              <div>
+                <div style={{ fontSize: "9px", letterSpacing: "5px", color: "#c8f870", fontFamily: "monospace", marginBottom: "4px" }}>LUXURY ASSET INTELLIGENCE · ₹ INR</div>
+                <h1 style={{ fontSize: "clamp(32px,5vw,56px)", fontFamily: "Georgia,serif", fontWeight: "900", color: "#fff", lineHeight: "0.95" }}>THE VAULT</h1>
+                <p style={{ fontSize: "12px", color: "#444", marginTop: "8px", maxWidth: "480px", lineHeight: "1.6" }}>{DB.length} investment-grade luxury assets. Compare returns vs NIFTY 50, S&P 500, Gold, Bitcoin, FD & PPF.</p>
+              </div>
+              <div style={{ display: "flex", gap: "20px" }}>
+                {[{ l: "ASSETS", v: DB.length }, { l: "AVG ROI", v: `+${avgROI}%`, c: "#c8f870" }].map((s, i) => (<div key={i} style={{ textAlign: "right" }}><div style={{ fontSize: "8px", color: "#444", letterSpacing: "2px" }}>{s.l}</div><div style={{ fontSize: "18px", fontFamily: "Georgia,serif", fontWeight: "700", color: s.c || "#fff" }}>{s.v}</div></div>))}
+              </div>
+            </div>
+            <div style={{ height: "1px", background: "linear-gradient(90deg,#c8f870,transparent 70%)", margin: "16px 0 20px" }} />
+
+            {/* ── TAB NAV ── */}
+            <div style={{ display: "flex", gap: "3px", marginBottom: "28px", background: "rgba(255,255,255,0.02)", borderRadius: "10px", padding: "3px", width: "fit-content" }}>
+              {[{ k: "calc", l: "🧮 Calculator" }, { k: "ai", l: "🤖 AI Lookup" }, { k: "browse", l: `📦 Browse ${DB.length}` }].map(t => (<button key={t.k} onClick={() => setTab(t.k)} style={{ padding: "10px 20px", border: "none", borderRadius: "8px", background: tab === t.k ? "#c8f870" : "transparent", color: tab === t.k ? "#0a0a0a" : "#555", fontSize: "12px", fontWeight: tab === t.k ? "700" : "500", cursor: "pointer", fontFamily: "system-ui,sans-serif" }}>{t.l}</button>))}
+            </div>
+
+            {/* ═══ CALCULATOR TAB ═══ */}
+            {tab === "calc" && (<div>
+
+              {/* ── TOP ROI ITEMS ── */}
+              <div style={{ marginBottom: "32px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                  <div>
+                    <div style={{ fontSize: "9px", color: "#c8f870", letterSpacing: "3px", marginBottom: "4px" }}>🔥 HIGHEST ROI</div>
+                    <div style={{ fontSize: "18px", fontFamily: "Georgia,serif", fontWeight: "700", color: "#fff" }}>Top Performers</div>
+                  </div>
+                  <div style={{ fontSize: "10px", color: "#333" }}>by all-time return</div>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: "14px" }}>
+                  {topROI.map((item, i) => <TopROICard key={item.id} item={item} rank={i + 1} onClick={selP} />)}
+                </div>
+              </div>
+
+              <div style={{ height: "1px", background: "linear-gradient(90deg,rgba(200,248,112,0.15),transparent 60%)", marginBottom: "28px" }} />
+
+              {/* ── GROWW-STYLE ROI CALCULATOR ── */}
+              <div style={{ marginBottom: "20px" }}>
+                <div style={{ fontSize: "9px", color: "#c8f870", letterSpacing: "3px", marginBottom: "4px" }}>🧮 ROI CALCULATOR</div>
+                <div style={{ fontSize: "18px", fontFamily: "Georgia,serif", fontWeight: "700", color: "#fff" }}>Calculate Your Returns</div>
+              </div>
+
+              {/* Mode toggle + asset selector */}
+              <div style={{ display: "flex", gap: "3px", marginBottom: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "8px", padding: "3px", width: "fit-content" }}>
+                {[{ k: "database", l: "📦 From Database" }, { k: "custom", l: "✏️ Custom Asset" }].map(m => (<button key={m.k} onClick={() => setMode(m.k)} style={{ padding: "7px 16px", border: "none", borderRadius: "6px", background: mode === m.k ? "rgba(200,248,112,0.12)" : "transparent", color: mode === m.k ? "#c8f870" : "#555", fontSize: "11px", fontWeight: "600", cursor: "pointer" }}>{m.l}</button>))}
+              </div>
+
+              {/* Asset selector row */}
+              {mode === "database" ? (
+                <div ref={dropRef} style={{ position: "relative", marginBottom: "20px" }}>
+                  <label style={LS}>SEARCH {DB.length} PRODUCTS</label>
+                  <input value={search} onChange={e => { setSearch(e.target.value); setShow(true); }} onFocus={() => setShow(true)} placeholder="Jordan 1, Birkin, Submariner..." style={IS} />
+                  {show && (<div style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100, background: "#111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", marginTop: "4px", maxHeight: "350px", overflowY: "auto", boxShadow: "0 16px 48px rgba(0,0,0,0.9)" }}>
+                    <div style={{ display: "flex", gap: "2px", padding: "6px", borderBottom: "1px solid rgba(255,255,255,0.04)", position: "sticky", top: 0, background: "#111", zIndex: 1 }}>{CATS.map(c => (<button key={c} onClick={e => { e.stopPropagation(); setCatF(c); }} style={{ padding: "4px 10px", border: "none", borderRadius: "5px", background: catF === c ? "rgba(200,248,112,0.1)" : "transparent", color: catF === c ? "#c8f870" : "#444", fontSize: "10px", cursor: "pointer" }}>{c}</button>))}</div>
+                    {searchFilt.slice(0, 20).map(item => (<div key={item.id} onClick={() => { selP(item); setShow(false); }} style={{ padding: "10px 14px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.02)", display: "flex", justifyContent: "space-between" }} onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.03)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                      <div><div style={{ fontSize: "12px", color: "#ccc" }}>{item.name}</div><div style={{ fontSize: "10px", color: "#555" }}>{item.colorway} · {item.brand} · {item.releaseYear}</div></div>
+                      <div style={{ textAlign: "right" }}><div style={{ fontSize: "12px", fontFamily: "monospace", color: "#fff" }}>{fINR(item.currentPrice)}</div><div style={{ fontSize: "10px", fontFamily: "monospace", color: "#c8f870" }}>+{roi(item.retailPrice, item.currentPrice)}%</div></div>
+                    </div>))}
+                    {searchFilt.length === 0 && <div style={{ padding: "16px", textAlign: "center", color: "#333", fontSize: "12px" }}>No results. Try AI →</div>}
+                  </div>)}
+                  {sel && (<div style={{ marginTop: "14px", padding: "14px", background: "rgba(200,248,112,0.02)", border: "1px solid rgba(200,248,112,0.08)", borderRadius: "12px", display: "flex", gap: "12px", alignItems: "center" }}>
+                    <div style={{ width: "44px", height: "44px", borderRadius: "8px", background: GRAD[sel.category], display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px", flexShrink: 0 }}>{ICON[sel.category]}</div>
+                    <div style={{ flex: 1 }}><div style={{ fontSize: "13px", fontWeight: "600", color: "#fff" }}>{sel.name}</div><div style={{ fontSize: "10px", color: "#555" }}>{sel.colorway} · {sel.brand} · {sel.releaseYear}</div></div>
+                    <div style={{ textAlign: "right" }}><div style={{ fontSize: "14px", fontFamily: "monospace", color: "#c8f870", fontWeight: "600" }}>{fINR(sel.currentPrice)}</div><div style={{ fontSize: "10px", fontFamily: "monospace", color: "#666" }}>+{roi(sel.retailPrice, sel.currentPrice)}%</div></div>
+                  </div>)}
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
+                  <div><label style={LS}>PRODUCT NAME</label><input value={cN} onChange={e => setCN(e.target.value)} placeholder="e.g. Nike SB Dunk Low Paris" style={IS} /></div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
+                    <div><label style={LS}>RETAIL (₹)</label><input type="number" value={cR} onChange={e => setCR(e.target.value)} placeholder="13600" style={{ ...IS, fontFamily: "monospace" }} /></div>
+                    <div><label style={LS}>CURRENT (₹)</label><input type="number" value={cC} onChange={e => setCC(e.target.value)} placeholder="238000" style={{ ...IS, fontFamily: "monospace" }} /></div>
+                    <div><label style={LS}>YEAR</label><select value={cY} onChange={e => setCY(e.target.value)} style={{ ...IS, cursor: "pointer", fontFamily: "monospace" }}>{Array.from({ length: 57 }, (_, i) => 1970 + i).map(y => <option key={y} value={y}>{y}</option>)}</select></div>
+                  </div>
+                  {aiRes && <div style={{ background: "rgba(200,248,112,0.04)", border: "1px solid rgba(200,248,112,0.1)", borderRadius: "8px", padding: "8px 12px", fontSize: "11px", color: "#888" }}>🤖 {aiRes.source || "web"} · <span style={{ color: "#c8f870" }}>{aiRes.confidence}</span></div>}
+                </div>
+              )}
+
+              {/* ── GROWW-STYLE CALCULATOR CARD ── */}
+              <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "16px", padding: "28px", animation: "slideIn 0.3s ease" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "40px", alignItems: "start" }}>
+
+                  {/* LEFT: Sliders */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+                    {/* Investment Amount Slider */}
+                    <div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                        <label style={{ fontSize: "13px", color: "#aaa", fontWeight: "500" }}>Investment amount</label>
+                        <div style={{ background: "rgba(200,248,112,0.06)", border: "1px solid rgba(200,248,112,0.15)", borderRadius: "8px", padding: "6px 14px", display: "flex", alignItems: "center", gap: "2px" }}>
+                          <span style={{ fontSize: "13px", color: "#c8f870" }}>₹</span>
+                          <input type="number" value={investAmt} onChange={e => setInvestAmt(Math.max(0, Math.min(10000000, Number(e.target.value) || 0)))} style={{ background: "transparent", border: "none", outline: "none", color: "#c8f870", fontSize: "15px", fontWeight: "600", fontFamily: "monospace", width: "110px", textAlign: "right" }} />
+                        </div>
+                      </div>
+                      <input type="range" min="10000" max="10000000" step="10000" value={investAmt}
+                        onChange={e => setInvestAmt(Number(e.target.value))}
+                        style={{ "--val": `${((investAmt - 10000) / (10000000 - 10000)) * 100}%` }} />
+                      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "6px" }}>
+                        <span style={{ fontSize: "9px", color: "#333" }}>₹10K</span>
+                        <span style={{ fontSize: "9px", color: "#333" }}>₹1 Cr</span>
+                      </div>
+                    </div>
+
+                    {/* Buy Year / Time Period — INTERACTIVE */}
+                    <div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                        <label style={{ fontSize: "13px", color: "#aaa", fontWeight: "500" }}>Buy year</label>
+                        <div style={{ background: "rgba(200,248,112,0.06)", border: "1px solid rgba(200,248,112,0.15)", borderRadius: "8px", padding: "6px 14px", display: "flex", alignItems: "center", gap: "2px" }}>
+                          <input type="number" value={effectiveBuyYear}
+                            onChange={e => { const v = Number(e.target.value); if (v >= releaseYr && v <= 2025) setBuyYear(v); }}
+                            style={{ background: "transparent", border: "none", outline: "none", color: "#c8f870", fontSize: "15px", fontWeight: "600", fontFamily: "monospace", width: "55px", textAlign: "right" }} />
+                        </div>
+                      </div>
+                      {has && (<>
+                        <input type="range" min={releaseYr} max={2025} step="1" value={effectiveBuyYear}
+                          onChange={e => setBuyYear(Number(e.target.value))}
+                          style={{ "--val": `${totalYrs > 1 ? ((effectiveBuyYear - releaseYr) / (2025 - releaseYr)) * 100 : 0}%` }} />
+                        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "6px" }}>
+                          <span style={{ fontSize: "9px", color: "#333" }}>{releaseYr} (launch)</span>
+                          <span style={{ fontSize: "9px", color: "#333" }}>2025</span>
+                        </div>
+                        <div style={{ fontSize: "10px", color: "#555", marginTop: "8px" }}>
+                          Holding: <strong style={{ color: "#c8f870" }}>{holdingYrs} yr{holdingYrs !== 1 ? "s" : ""}</strong> · Est. buy price: <strong style={{ color: "#fff" }}>{fINR(buyPrice)}</strong>
+                        </div>
+                      </>)}
+                      {!has && (<>
+                        <input type="range" min="2000" max="2025" step="1" value={effectiveBuyYear}
+                          onChange={e => setBuyYear(Number(e.target.value))}
+                          style={{ "--val": `${((effectiveBuyYear - 2000) / 25) * 100}%` }} />
+                        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "6px" }}>
+                          <span style={{ fontSize: "9px", color: "#333" }}>2000</span>
+                          <span style={{ fontSize: "9px", color: "#333" }}>2025</span>
+                        </div>
+                      </>)}
+                    </div>
+
+                    {/* Holding Period (read-only, derived) */}
+                    <div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                        <label style={{ fontSize: "13px", color: "#aaa", fontWeight: "500" }}>Holding period</label>
+                        <div style={{ background: "rgba(200,248,112,0.06)", border: "1px solid rgba(200,248,112,0.15)", borderRadius: "8px", padding: "6px 14px", display: "flex", alignItems: "center", gap: "2px" }}>
+                          <span style={{ color: "#c8f870", fontSize: "15px", fontWeight: "600", fontFamily: "monospace" }}>{holdingYrs}</span>
+                          <span style={{ fontSize: "13px", color: "#c8f870", marginLeft: "2px" }}>Yr</span>
+                        </div>
+                      </div>
+                      <input type="range" min="1" max={Math.max(totalYrs, 1)} step="1" value={holdingYrs} readOnly
+                        style={{ "--val": `${totalYrs > 1 ? ((holdingYrs - 1) / (totalYrs - 1)) * 100 : 100}%`, opacity: 0.5 }} />
+                      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "6px" }}>
+                        <span style={{ fontSize: "9px", color: "#333" }}>1 Yr</span>
+                        <span style={{ fontSize: "9px", color: "#333" }}>{Math.max(totalYrs, 1)} Yr</span>
+                      </div>
+                    </div>
+
+                    {/* CAGR (auto-calculated) */}
+                    <div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                        <label style={{ fontSize: "13px", color: "#aaa", fontWeight: "500" }}>Return rate (CAGR p.a.)</label>
+                        <div style={{ background: "rgba(200,248,112,0.06)", border: "1px solid rgba(200,248,112,0.15)", borderRadius: "8px", padding: "6px 14px", display: "flex", alignItems: "center", gap: "2px" }}>
+                          <span style={{ color: "#c8f870", fontSize: "15px", fontWeight: "600", fontFamily: "monospace" }}>{has ? cagrV : "—"}</span>
+                          <span style={{ fontSize: "13px", color: "#c8f870", marginLeft: "2px" }}>%</span>
+                        </div>
+                      </div>
+                      <input type="range" min="0" max="200" step="0.5" value={has ? Math.min(Math.abs(Number(cagrV)), 200) : 0} readOnly
+                        style={{ "--val": `${(Math.min(has ? Math.abs(Number(cagrV)) : 0, 200) / 200) * 100}%`, opacity: 0.5 }} />
+                      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "6px" }}>
+                        <span style={{ fontSize: "9px", color: "#333" }}>0%</span>
+                        <span style={{ fontSize: "9px", color: "#333" }}>200%</span>
+                      </div>
+                      {has && <div style={{ fontSize: "10px", color: "#444", marginTop: "6px" }}>Auto-calculated: buy at {fINR(buyPrice)} in {effectiveBuyYear} → {fINR(curP)} now</div>}
+                    </div>
+                  </div>
+
+                  {/* RIGHT: Donut Chart + Results */}
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "24px" }}>
+                    {has ? (
+                      <>
+                        <DonutChart invested={investAmt} returns={Math.max(sipGain, 0)} />
+                        <div style={{ width: "100%" }}>
+                          {[
+                            { label: "Invested amount", value: fFull(investAmt), color: "#5b6cf7", dot: true },
+                            { label: "Est. returns", value: sipGain >= 0 ? `+${fFull(sipGain)}` : `-${fFull(Math.abs(sipGain))}`, color: "#c8f870", dot: true },
+                            { label: "Total value", value: fFull(sipVal), color: "#fff", dot: false },
+                          ].map((row, i) => (
+                            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 0", borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                {row.dot && <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: row.color }} />}
+                                {!row.dot && <div style={{ width: "10px" }} />}
+                                <span style={{ fontSize: "13px", color: "#888" }}>{row.label}</span>
+                              </div>
+                              <span style={{ fontSize: "16px", fontFamily: "monospace", fontWeight: "700", color: row.color }}>{row.value}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Quick stats row */}
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", width: "100%" }}>
+                          {[{ l: "ROI", v: `+${roiV}%` }, { l: "MULTIPLIER", v: `${assetMult.toFixed(1)}×` }, { l: "CAGR", v: `${cagrV}%` }].map((s, i) => (
+                            <div key={i} style={{ background: "rgba(0,0,0,0.3)", borderRadius: "8px", padding: "10px", textAlign: "center" }}>
+                              <div style={{ fontSize: "8px", color: "#444", letterSpacing: "1px", marginBottom: "3px" }}>{s.l}</div>
+                              <div style={{ fontSize: "16px", fontFamily: "monospace", color: "#c8f870", fontWeight: "700" }}>{s.v}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "300px", gap: "12px" }}>
+                        <div style={{ fontSize: "48px", opacity: 0.2 }}>🧮</div>
+                        <div style={{ fontSize: "13px", color: "#333", textAlign: "center" }}>Select an asset from the database<br/>or enter custom prices to calculate</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* ── BENCHMARK COMPARISON (below calculator) ── */}
+              {has && (<div style={{ marginTop: "24px", background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)", borderRadius: "14px", padding: "22px" }}>
+                <div style={{ fontSize: "10px", color: "#c8f870", letterSpacing: "3px", marginBottom: "8px" }}>📊 BENCHMARK COMPARISON</div>
+                <CompChart amt={investAmt} yr={effectiveBuyYear} mult={assetMult} name={dispName} />
+              </div>)}
+            </div>)}
+
+            {/* ═══ AI LOOKUP TAB ═══ */}
+            {tab === "ai" && (<div style={{ maxWidth: "680px" }}>
+              <div style={{ marginBottom: "24px" }}>
+                <div style={{ fontSize: "9px", color: "#c8f870", letterSpacing: "3px", marginBottom: "6px" }}>🤖 AI-POWERED LIVE PRICE ENGINE</div>
+                <h2 style={{ fontSize: "26px", fontFamily: "Georgia,serif", fontWeight: "700", color: "#fff", marginBottom: "6px" }}>Look up any luxury item</h2>
+                <p style={{ fontSize: "12px", color: "#555" }}>AI searches StockX, GOAT, Chrono24 for real-time prices → auto-converts to ₹</p>
+              </div>
+              <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+                <input value={aiQ} onChange={e => setAiQ(e.target.value)} onKeyDown={e => e.key === "Enter" && doAI()} placeholder="e.g. Nike MAG, Patek 5711 Tiffany..." style={{ ...IS, flex: 1, padding: "14px 16px", fontSize: "14px" }} />
+                <button onClick={doAI} disabled={aiL || !aiQ.trim()} style={{ padding: "14px 24px", border: "none", borderRadius: "8px", background: aiL ? "#333" : "#c8f870", color: "#0a0a0a", fontSize: "13px", fontWeight: "700", cursor: aiL ? "wait" : "pointer", whiteSpace: "nowrap" }}>{aiL ? "Searching..." : "🔍 Look Up"}</button>
+              </div>
+              {aiL && <div style={{ padding: "36px", textAlign: "center", background: "rgba(255,255,255,0.015)", borderRadius: "12px" }}><div style={{ fontSize: "28px", animation: "pulse 1.5s infinite", marginBottom: "10px" }}>🤖</div><div style={{ fontSize: "12px", color: "#888" }}>Searching markets... ~10s</div></div>}
+              {aiErr && <div style={{ padding: "14px", background: "rgba(255,100,100,0.06)", border: "1px solid rgba(255,100,100,0.15)", borderRadius: "10px", fontSize: "12px", color: "#ff8888" }}>⚠️ {aiErr}</div>}
+              {aiRes && !aiL && (<div style={{ animation: "slideIn 0.3s ease" }}>
+                <div style={{ background: "rgba(200,248,112,0.03)", border: "1px solid rgba(200,248,112,0.1)", borderRadius: "14px", padding: "22px", marginBottom: "12px" }}>
+                  <div style={{ fontSize: "16px", fontWeight: "600", color: "#fff", marginBottom: "4px" }}>{aiRes.name}</div>
+                  <div style={{ fontSize: "11px", color: "#666", marginBottom: "14px" }}>{aiRes.brand} · {aiRes.colorway} · {aiRes.releaseYear}</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px", marginBottom: "14px" }}>
+                    {[{ l: "RETAIL", v: fINR(aiRes.retailINR), c: "#666" }, { l: "RESALE", v: fINR(aiRes.currentINR), c: "#c8f870" }, { l: "ROI", v: `+${roi(aiRes.retailINR, aiRes.currentINR)}%`, c: "#c8f870" }].map((s, i) => (<div key={i} style={{ background: "rgba(0,0,0,0.3)", borderRadius: "8px", padding: "12px" }}><div style={{ fontSize: "8px", color: "#444", letterSpacing: "1px", marginBottom: "3px" }}>{s.l}</div><div style={{ fontSize: "16px", fontFamily: "monospace", color: s.c }}>{s.v}</div></div>))}
+                  </div>
+                  <div style={{ background: "rgba(200,248,112,0.04)", borderRadius: "8px", padding: "10px", textAlign: "center" }}>
+                    <div style={{ fontSize: "8px", color: "#666", letterSpacing: "1px" }}>₹1,00,000 AT LAUNCH → NOW</div>
+                    <div style={{ fontSize: "24px", fontFamily: "Georgia,serif", fontWeight: "900", color: "#c8f870" }}>{fINR(Math.round(100000 * aiRes.currentINR / (aiRes.retailINR || 1)))}</div>
+                  </div>
+                </div>
+                <button onClick={() => { setTab("calc"); setMode("custom"); }} style={{ width: "100%", padding: "12px", border: "1px solid rgba(200,248,112,0.2)", borderRadius: "10px", background: "rgba(200,248,112,0.05)", color: "#c8f870", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}>📊 Open in Calculator →</button>
+              </div>)}
+              <div style={{ marginTop: "28px", padding: "16px", background: "rgba(255,255,255,0.015)", borderRadius: "10px" }}>
+                <div style={{ fontSize: "9px", color: "#555", letterSpacing: "2px", marginBottom: "10px" }}>TRY THESE</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                  {["Nike MAG 2016", "Rolex Daytona Rainbow", "Hermès Kelly Pochette", "Patek 5711 Tiffany", "Supreme CDG Box Logo", "AP Royal Oak Offshore"].map((q, i) => (<button key={i} onClick={() => setAiQ(q)} style={{ padding: "5px 10px", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", background: "transparent", color: "#555", fontSize: "10px", cursor: "pointer" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(200,248,112,0.2)"; e.currentTarget.style.color = "#c8f870"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "#555"; }}>{q}</button>))}
+                </div>
+              </div>
+            </div>)}
+
+            {/* ═══ BROWSE TAB ═══ */}
+            {tab === "browse" && (<div>
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "10px" }}>
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder={`Search ${DB.length} assets...`} style={{ ...IS, flex: 1, minWidth: "200px" }} />
+                <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ ...IS, width: "auto", cursor: "pointer", fontSize: "11px", color: "#888" }}><option value="roi_desc">Highest ROI</option><option value="price_desc">Highest Value</option><option value="year_desc">Newest</option></select>
+              </div>
+              <div style={{ display: "flex", gap: "3px", marginBottom: "8px" }}>{CATS.map(c => (<button key={c} onClick={() => setCatF(c)} style={{ padding: "6px 14px", border: "none", borderRadius: "6px", background: catF === c ? "#c8f870" : "transparent", color: catF === c ? "#0a0a0a" : "#555", fontSize: "11px", fontWeight: catF === c ? "700" : "500", cursor: "pointer" }}>{c}</button>))}</div>
+              <div style={{ display: "flex", gap: "3px", marginBottom: "14px", flexWrap: "wrap" }}>
+                <button onClick={() => setBrandF("All")} style={{ padding: "3px 10px", border: "none", borderRadius: "4px", background: brandF === "All" ? "rgba(200,248,112,0.1)" : "transparent", color: brandF === "All" ? "#c8f870" : "#444", fontSize: "9px", cursor: "pointer" }}>All</button>
+                {brands.slice(0, 16).map(b => (<button key={b} onClick={() => setBrandF(b)} style={{ padding: "3px 10px", border: "none", borderRadius: "4px", background: brandF === b ? "rgba(200,248,112,0.1)" : "transparent", color: brandF === b ? "#c8f870" : "#444", fontSize: "9px", cursor: "pointer" }}>{b}</button>))}
+              </div>
+              <div style={{ fontSize: "10px", color: "#333", marginBottom: "10px" }}>{filtered.length} items · Page {page}/{tP || 1}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(230px,1fr))", gap: "12px" }}>
+                {pg.map(item => <PCard key={item.id} item={item} onClick={selP} />)}
+              </div>
+              {tP > 1 && (<div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "20px" }}>
+                <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1} style={{ padding: "8px 14px", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "6px", background: "transparent", color: page === 1 ? "#222" : "#888", cursor: page === 1 ? "default" : "pointer", fontSize: "11px" }}>← Prev</button>
+                <span style={{ padding: "8px", color: "#444", fontSize: "11px" }}>{page}/{tP}</span>
+                <button onClick={() => setPage(Math.min(tP, page + 1))} disabled={page === tP} style={{ padding: "8px 14px", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "6px", background: "transparent", color: page === tP ? "#222" : "#888", cursor: page === tP ? "default" : "pointer", fontSize: "11px" }}>Next →</button>
+              </div>)}
+            </div>)}
+
+            {/* ── FOOTER ── */}
+            <div style={{ marginTop: "48px", paddingTop: "12px", borderTop: "1px solid rgba(255,255,255,0.03)", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
+              <div style={{ fontSize: "9px", color: "#222" }}>THE VAULT · {DB.length} Assets · ₹INR · NIFTY/S&P/Gold/BTC © 2026</div>
+              <div style={{ fontSize: "8px", color: "#222" }}>₹{USD_INR}/USD · Past performance ≠ future returns · Not financial advice</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ═══ RENDER ═══
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
